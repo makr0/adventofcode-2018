@@ -7,7 +7,7 @@ The solutions are written with the following goals:
 3. **Speed** Try to be as fast as possible. At least inform your user about intent and progress
 
 ## Usage
-
+Solutions are written in PHP. Install php locally or use `ddev start && ddev ssh`.
 Run each day using the runday.sh script and the day number. You must provide input at stdin.
 
 Example for Day1:
