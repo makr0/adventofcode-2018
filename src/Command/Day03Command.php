@@ -21,62 +21,80 @@ class Day03Command extends Command
         $this->output = $output;
         $lines = array_map('trim', file('php://stdin'));
 
-        $result1 = $this->part1($lines);
-//        $result2 = $this->part2($lines);
+        $claims = $this->parseClaims($lines );
+        $fabric = $this->markFabric($claims);
+        $result1 = $this->part1($fabric);
+        $result2 = $this->part2($claims, $fabric);
 
-        $output->writeln("area claimed more than once (part1): $result1");
-//        $output->writeln("common chars (part2): $result2");
+        $output->writeln("area claimed more than once (part1): $result1"); // accepted: 101469
+        $output->writeln("first untaitned claim (part2): $result2"); // accepted: 1067
     }
 
-    private function part1($lines) {
-        $fabric = [];
-        for($x=0;$x<1000;$x++) {
-            for($y=0;$y<1000;$y++) {
-                $fabric[$x][$y] = 0;
-            }
-        }
-        $claims = [];
-        foreach ($lines as $line) {
-            $parts = explode(' ', $line);
-            $start = explode(',', str_replace(':', '', $parts[2]));
-            $claim = [
-                'id' => $parts[0],
-                'start' => [(int)$start[0],(int)$start[1]]
-            ];
-            $size = explode('x', $parts[3]);
-            $claim['end'] = [
-                $claim['start'][0] + $size[0],
-                $claim['start'][1] + $size[1]
-            ];
-            $claims[]=$claim;
-        }
+    private function part1($fabric) {
         $multiClaimed=0;
-        foreach ($claims as $claim) {
-            for ($x = $claim['start'][0]; $x < $claim['end'][0]; $x++) {
-                for ($y = $claim['start'][1]; $y < $claim['end'][1]; $y++) {
-                    $fabric[$x][$y] = $fabric[$x][$y]+1;
-                    if($fabric[$x][$y]>1) {
-                        $multiClaimed++;
-                    }
-                }
-            }
-
-//            $this->output->writeln(vsprintf('%s: %d,%d:%d,%d => %d',[$claim['id'],$claim['start'][0],$claim['start'][1],$claim['end'][0],$claim['end'][1],$multiClaimed]));
-        }
-//        for($x=0;$x<1000;$x++) {
-//            for($y=0;$y<1000;$y++) {
-//                switch( $fabric[$x][$y]) {
-//                    case 0: $this->output->write(' '); break;
-//                    case 1: $this->output->write('.'); break;
-//                    default: $this->output->write($fabric[$x][$y]); break;
-//                }
-//            }
-//            $this->output->writeln('');
-//        }
+        array_walk_recursive($fabric, function ($value, $key) use(&$multiClaimed) {
+            if($value > 1 ) $multiClaimed++;
+        });
 
         return $multiClaimed;
     }
 
-    private function part2($lines) {
+    private function part2($claims,$fabric) {
+        foreach ($claims as $claim) {
+            $tainted = 0;
+            for ($x = $claim['start'][0]; $x < $claim['end'][0]; $x++) {
+                for ($y = $claim['start'][1]; $y < $claim['end'][1]; $y++) {
+                    if($fabric[$x][$y]>1) $tainted=1;
+                }
+            }
+            if($tainted==0) return $claim['id'];
+        }
+        return '--ERROR--';
+    }
+
+    /**
+     * @param $lines
+     * @param array $claims
+     * @return array
+     */
+    private function parseClaims(array $lines): array {
+        $claims = [];
+        foreach ($lines as $line) {
+            $parts = explode(' ', str_replace(':', '', $line));
+            $start = array_map('intval', explode(',', $parts[2]));
+            $claim = [
+                'id' => $parts[0],
+                'start' => [$start[0], $start[1]]
+            ];
+            $claim['size'] = array_map('intval', explode('x', $parts[3]));
+            $claim['end'] = [
+                $claim['start'][0] + $claim['size'][0],
+                $claim['start'][1] + $claim['size'][1]
+            ];
+            $claims[] = $claim;
+        }
+        return $claims;
+    }
+
+    /**
+     * @param array $claims
+     * @return array
+     */
+    private function markFabric(array $claims): array {
+        $fabric = [];
+        $fabricSize = [1000, 1000];
+        for ($x = 0; $x <= $fabricSize[0]; $x++) {
+            for ($y = 0; $y <= $fabricSize[1]; $y++) {
+                $fabric[$x][$y] = 0;
+            }
+        }
+        foreach ($claims as $claim) {
+            for ($x = $claim['start'][0]; $x < $claim['end'][0]; $x++) {
+                for ($y = $claim['start'][1]; $y < $claim['end'][1]; $y++) {
+                    $fabric[$x][$y] = $fabric[$x][$y] + 1;
+                }
+            }
+        }
+        return $fabric;
     }
 }
