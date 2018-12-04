@@ -23,8 +23,8 @@ class Day04Command extends Command
         asort($lines);
 //        dump($lines);
 
-        $result1 = $this->part1($lines);
-//        $result2 = $this->part2($claims, $fabric);
+        $result1 = $this->part1($lines); // 34460-65474
+//        $result2 = $this->part2($lines);
 
         $output->writeln("Minutes asleep the most (part1): $result1"); // accepted:
 //        $output->writeln("first untaitned claim (part2): $result2"); // accepted:
@@ -36,6 +36,7 @@ class Day04Command extends Command
             preg_match ( '~^\[(.*) \d+:(\d+)\] (.*)$~', $line, $lineparts );
             if(preg_match ( '~^Guard #(\d+) begins shift$~', $lineparts[3], $matches )) {
                 $guard = $matches[1] ;
+                if(!isset($guards[$guard])) $guards[$guard] = [];
             }
             if(preg_match ( '~^falls asleep$~', $lineparts[3], $matches )) {
                 $time_asleep = (int)$lineparts[2];
@@ -48,16 +49,24 @@ class Day04Command extends Command
                 }
             }
         }
-        $maxguard=[0,0];
+        $maxguard=[0,0,0];
+        $this->output->write('    ');
+        for($m=0;$m<=59;$m++) {
+            $this->output->write('|'.sprintf('%02d',$m));
+        }
+        $this->output->writeln('|');
         foreach($guards as $id => $minutes) {
-            foreach($minutes as $minute => $sleeptime) {
-                if($maxguard[0]<$sleeptime) {
-                    $maxguard=[$minute,$id];
+            $this->output->write(sprintf('%4d',$id));
+            for($m=0;$m<=59;$m++) {
+                if(isset($minutes[$m])) {
+                    $this->output->write('|'.sprintf('%02d',$minutes[$m]));
+                } else {
+                    $this->output->write('|..');
                 }
             }
+            $this->output->writeln('|');
         }
-        dump($maxguard);
-        return $maxguard[0] * $maxguard[1];
+        return $maxguard[2] * $maxguard[1];
     }
 
     private function part2($claims,$fabric) {
