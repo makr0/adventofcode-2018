@@ -20,7 +20,7 @@ class Day05Command extends Command
     protected function execute(InputInterface $input, OutputInterface $output) {
         $this->output = $output;
         $this->output->writeln($this->getDescription());
-        $units = str_split(file_get_contents('php://stdin'));
+        $units = file_get_contents('php://stdin');
 
         $result1 = $this->part1($units);
         $output->writeln("Remaining Units (part1): $result1"); // toolow: 10330, accepted: 10762
@@ -30,16 +30,14 @@ class Day05Command extends Command
     }
 
     private function part1($units) {
-        $this->output->writeln("Units in Input: ".count($units)); //
-        while($this->removeNextPair($units)){
-        };
-        $this->output->writeln(count($units));
-        return count($units);
+        $this->output->writeln("Units in Input: ".strlen($units)); //
+        $units = $this->removePairs($units);
+        return strlen($units);
     }
 
     private function part2($units) {
-        $this->output->writeln("Units in Input: ".count($units)); //
-        $types = array_unique(array_map('strtoupper',$units));
+        $this->output->writeln("Units in Input: ".strlen($units)); //
+        $types = array_unique(array_map('strtoupper',str_split($units)));
 
         sort($types);
         $this->output->write('Types in input: ');
@@ -47,33 +45,30 @@ class Day05Command extends Command
             $this->output->write($type);
         }
         $this->output->write("\r\n");
-        $minlength = count($units);
+        $minlength = strlen($units);
         foreach($types as $type) {
             $this->output->write("Testing $type");
-            $units_minus_type = array_filter($units,function($a) use($type) {
-                return strtoupper($a) != $type;
-            });
-            $this->output->write('['.count($units_minus_type).'] => ');
-            while($this->removeNextPair($units_minus_type));
-            $minlength = min($minlength,count($units_minus_type));
-            $this->output->writeln(count($units_minus_type)." best: $minlength");
+            $units_minus_type = preg_replace("~$type|".strtolower($type)."~",'',$units);
+            $this->output->write('['.strlen($units_minus_type).'] => ');
+            $units_minus_type = $this->removePairs($units_minus_type);
+            $minlength = min($minlength,strlen($units_minus_type));
+            $this->output->writeln(strlen($units_minus_type)." best: $minlength");
         }
         return $minlength;
     }
 
-    private function removeNextPair(array &$units) {
-        foreach ($units as $index => $unit) {
-            if(!isset($units[$index+1])) break;
-            $nextUnit = $units[$index+1];
-            if(  $unit != $nextUnit
-                && (     strtolower($unit) == $nextUnit
-                      || strtoupper($unit) == $nextUnit )
-            ) {
-                array_splice($units, $index,2);
-                return true;
-            }
+    private function removePairs($units) {
+        $length_before = strlen($units);
+        $types = array_unique(array_map('strtolower',str_split($units)));
+        foreach ($types as $type ) {
+            $typeUpper = strtoupper($type);
+            $regex = "~$type$typeUpper|$typeUpper$type~";
+            do {
+                $units = preg_replace($regex,'',$units,-1,$replacements);
+            } while($replacements);
         }
-        return false;
+        if(strlen($units)==$length_before) return $units;
+        else return $this->removePairs($units);
     }
 
 }
