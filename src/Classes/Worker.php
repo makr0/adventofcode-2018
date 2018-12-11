@@ -1,6 +1,6 @@
 <?php
 
-namespace Aoc2018\Command\Day07;
+namespace Aoc2018\Classes;
 
 class Worker
 {

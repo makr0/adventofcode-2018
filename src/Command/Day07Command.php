@@ -5,7 +5,7 @@ namespace Aoc2018\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Aoc2018\Command\Day07\Worker;
+use Aoc2018\Classes\Worker;
 
 class Day07Command extends Command
 {
