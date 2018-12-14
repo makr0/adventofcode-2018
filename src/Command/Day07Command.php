@@ -52,10 +52,9 @@ class Day07Command extends Command
             $timeTaken++;
             foreach($workers as $worker) {
                 if(!$worker->idle()) {
-                    $task = $worker->getTask();
                     $worker->tick();
                     if($worker->idle()) {
-                        $tasks = $this->removeTask($task,$tasks);
+                        $tasks = $this->removeTask($worker->getTask(),$tasks);
                     }
                 }
             }

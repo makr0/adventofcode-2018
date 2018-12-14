@@ -23,7 +23,7 @@ class Worker
 
     public function idle()
     {
-        return $this->task == '.';
+        return $this->work_left==0;
     }
 
     public function getTask()
@@ -37,7 +37,6 @@ class Worker
             $this->work_left--;
             if($this->work_left==0) {
                 dump('Worker finished '.$this->task);
-                $this->task='.';
             }
         }
     }
