@@ -5,30 +5,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Day02Command extends Command
+class Day02Command extends DailyBase
 {
-    protected static $defaultName = 'aoc2018:day02';
-    private $output;
+    protected $AocName = 'aoc2018:day02';
+    protected $AocDescription = "Day 2: Inventory Management System";
 
-    protected function configure()
-    {
-        $this
-        ->setDescription('Day 2: Inventory Management System');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $this->output = $output;
-        $lines = array_map('trim',file('php://stdin'));
-
-        $result1 = $this->part1($lines);
-        $result2 = $this->part2($lines);
-
-        $output->writeln("checksum (part1): $result1");
-        $output->writeln("common chars (part2): $result2");
-    }
-
-    private function part1($lines) {
+    protected function part1($lines) {
         $letters=[2=>0,3=>0];
         foreach($lines as $line) {
             $bins=[];
@@ -45,7 +27,7 @@ class Day02Command extends Command
         return $letters[2] * $letters[3];
     }
 
-    private function part2($lines) {
+    protected function part2($lines) {
         while($id1 = array_pop($lines)) {
             foreach($lines as $id2) {
                 $distance = levenshtein($id1,$id2,99,1,99);

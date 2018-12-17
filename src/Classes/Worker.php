@@ -18,7 +18,6 @@ class Worker
         if($task == false) return;
         $this->task=$task;
         $this->work_left=ord($task) - ord('A')+61;
-        dump('Worker started '.$this->task.' with duration '.$this->work_left);
     }
 
     public function idle()
@@ -35,9 +34,6 @@ class Worker
     {
         if($this->work_left > 0) {
             $this->work_left--;
-            if($this->work_left==0) {
-                dump('Worker finished '.$this->task);
-            }
         }
     }
 }

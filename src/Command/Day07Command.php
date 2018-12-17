@@ -7,29 +7,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Aoc2018\Classes\Worker;
 
-class Day07Command extends Command
+class Day07Command extends DailyBase
 {
-    protected static $defaultName = 'aoc2018:day07';
-    /** @var OutputInterface */
-    private $output;
+    protected $AocName = 'aoc2018:day07';
+    protected $AocDescription = "Day 7: The Sum of Its Parts";
 
-    protected function configure() {
-        $this
-            ->setDescription('Day 7: The Sum of Its Parts');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output) {
-        $this->output = $output;
-        $this->output->writeln($this->getDescription());
-        $lines = array_map('trim', file('php://stdin'));
-        $tasks = $this->readTasks($lines);
-        $result1 = $this->part1($tasks);
-        $output->writeln("Task order (part1): $result1");
-        $result2 = $this->part2($tasks);
-        $output->writeln("Total Time (part3): $result2");
-    }
-
-    private function part1($tasks) {
+    protected function part1($tasks) {
         $order = '';
         while($task = $this->nextFreeTask($tasks)) {
             $order.=$task;
@@ -38,7 +21,7 @@ class Day07Command extends Command
         return $order;
     }
 
-    private function part2($tasks) {
+    protected function part2($tasks) {
         for($i=0;$i<5;$i++) {
             $workers[$i] = new Worker();
             if($nextTask = $this->nextFreeTask($tasks)) {
@@ -95,7 +78,7 @@ class Day07Command extends Command
 
 
     // returns a list of tasks(keys) with dependent tasks (values)
-    private function readTasks($lines) {
+    protected function parseInput($lines) {
         $tasks = [];
         foreach ($lines as $line ) {
             preg_match('/Step ([A-Z]) must be finished before step ([A-Z])/',$line,$matches);

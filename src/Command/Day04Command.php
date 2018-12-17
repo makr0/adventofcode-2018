@@ -6,31 +6,18 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Day04Command extends Command
+class Day04Command extends DailyBase
 {
-    protected static $defaultName = 'aoc2018:day04';
-    /** @var OutputInterface */
-    private $output;
+    protected $AocName = 'aoc2018:day04';
+    protected $AocDescription = "Day 4: Repose Record";
 
-    protected function configure() {
-        $this
-            ->setDescription('Day 4: Repose Record');
+    protected function parseInput($input)
+    {
+        return $this->makeTimeTable($input);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
-        $this->output = $output;
-        $lines = array_map('trim', file('php://stdin'));
-        $timetable = $this->makeTimeTable($lines);
-
-        $result1 = $this->part1($timetable);
-        $result2 = $this->part2($timetable);
-
-        $output->writeln("Sleepiest Guard x sleepiest Minute (part1): $result1"); // accepted: 39422
-        $output->writeln("Guard most frequently asleep on the same minute (part2): $result2"); // accepted: 65474
-    }
-
-    private function part1($timetable) {
-        $maxSleep = 0;
+    protected function part1($timetable) {
+        $sleepiest_guard = $sleepiest_minute = $maxSleep = 0;
         foreach($timetable as $id => $minutes) {
             $minutes_asleep = array_sum($minutes);
             if($maxSleep<$minutes_asleep) {
@@ -43,7 +30,7 @@ class Day04Command extends Command
     }
 
 
-    private function part2($timetable) {
+    protected function part2($timetable) {
         $maxGuard=['id'=>0,'sleepMinutes'=>0,'minute'=>0];
         foreach($timetable as $id => $minutes) {
             foreach($minutes as $minute => $timesAsleepOnThatMinute) {

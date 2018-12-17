@@ -6,31 +6,14 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Day03Command extends Command
+class Day03Command extends DailyBase
 {
-    protected static $defaultName = 'aoc2018:day03';
-    /** @var OutputInterface */
-    private $output;
+    protected $AocName = 'aoc2018:day03';
+    protected $AocDescription = "Day 3: No Matter How You Slice It";
 
-    protected function configure() {
-        $this
-            ->setDescription('Day 3: No Matter How You Slice It');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output) {
-        $this->output = $output;
-        $lines = array_map('trim', file('php://stdin'));
-
+    protected function part1($lines) {
         $claims = $this->parseClaims($lines );
         $fabric = $this->markFabric($claims);
-        $result1 = $this->part1($fabric);
-        $result2 = $this->part2($claims, $fabric);
-
-        $output->writeln("area claimed more than once (part1): $result1"); // accepted: 101469
-        $output->writeln("first untaitned claim (part2): $result2"); // accepted: 1067
-    }
-
-    private function part1($fabric) {
         $multiClaimed=0;
         array_walk_recursive($fabric, function ($value, $key) use(&$multiClaimed) {
             if($value > 1 ) $multiClaimed++;
@@ -39,7 +22,9 @@ class Day03Command extends Command
         return $multiClaimed;
     }
 
-    private function part2($claims,$fabric) {
+    protected function part2($lines) {
+        $claims = $this->parseClaims($lines );
+        $fabric = $this->markFabric($claims);
         foreach ($claims as $claim) {
             $tainted = 0;
             for ($x = $claim['start'][0]; $x < $claim['end'][0]; $x++) {
